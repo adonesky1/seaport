@@ -22,6 +22,9 @@ import { AmountDeriver } from "./AmountDeriver.sol";
 
 import "./ConsiderationConstants.sol";
 
+import "hardhat/console.sol";
+
+
 /**
  * @title OrderFulfiller
  * @author 0age
@@ -78,6 +81,7 @@ contract OrderFulfiller is
         bytes32 fulfillerConduitKey,
         address recipient
     ) internal returns (bool) {
+
         // Ensure this function cannot be triggered during a reentrant call.
         _setReentrancyGuard();
 

@@ -19,6 +19,9 @@ contract TestZone is ZoneInterface {
         caller;
         offerer;
 
+        // if (orderHash != bytes32(uint256(1))) {
+        //     revert("Revert on zone hash 1");
+        // }
         if (zoneHash == bytes32(uint256(1))) {
             revert("Revert on zone hash 1");
         } else if (zoneHash == bytes32(uint256(2))) {
