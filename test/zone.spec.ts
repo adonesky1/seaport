@@ -105,6 +105,61 @@ describe(`Zone - PausableZone (Seaport v${VERSION})`, function () {
     return zoneCreatedEvent.data.zone as string;
   }
 
+  /** Create zone and get zone address */
+  async function createZoneReturnContract(
+    pausableZoneController: Contract,
+    salt?: string
+  ) {
+    const tx = await pausableZoneController.createZone(salt ?? randomHex());
+
+    const zoneContract = await ethers.getContractFactory("PausableZone", owner);
+
+    const zone = await zoneContract.deploy();
+    const events = await decodeEvents(tx, [
+      { eventName: "ZoneCreated", contract: pausableZoneController },
+      { eventName: "Unpaused", contract: zoneContract as any },
+    ]);
+    expect(events.length).to.be.equal(2);
+
+    const [unpauseEvent, zoneCreatedEvent] = events;
+    expect(unpauseEvent.eventName).to.equal("Unpaused");
+    expect(zoneCreatedEvent.eventName).to.equal("ZoneCreated");
+
+    return { zone, zoneAddr: zoneCreatedEvent.data.zone as string };
+  }
+
+  it.only("Calls isValidOrder correctly", async () => {
+    const pausableDeployer = await ethers.getContractFactory(
+      "PausableZoneController",
+      owner
+    );
+    const deployer = await pausableDeployer.deploy(owner.address);
+
+    const { zone, zoneAddr } = await createZoneReturnContract(deployer);
+
+    // create basic order using pausable as zone
+    // execute basic 721 <=> ETH order
+    const nftId = await mintAndApprove721(seller, marketplaceContract.address);
+
+    const offer = [getTestItem721(nftId)];
+
+    const consideration = [
+      getItemETH(parseEther("10"), parseEther("10"), seller.address),
+      getItemETH(parseEther("1"), parseEther("1"), owner.address),
+    ];
+
+    const { orderHash } = await createOrder(
+      seller,
+      zoneAddr,
+      offer,
+      consideration,
+      1 // FULL_RESTRICTED
+    );
+
+     const val = await zone.isValidOrder(orderHash, owner.address, seller.address, orderHash);
+     console.log('val:', val)
+  });
+
   it("Fulfills an order with a pausable zone", async () => {
     const pausableDeployer = await ethers.getContractFactory(
       "PausableZoneController",
@@ -139,6 +194,8 @@ describe(`Zone - PausableZone (Seaport v${VERSION})`, function () {
         .fulfillOrder(order, toKey(0), {
           value,
         });
+
+      // console.log("TX:", tx);
 
       const receipt = await tx.wait();
       await checkExpectedEvents(tx, receipt, [

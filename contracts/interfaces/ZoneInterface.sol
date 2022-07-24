@@ -13,7 +13,7 @@ interface ZoneInterface {
         address caller,
         address offerer,
         bytes32 zoneHash
-    ) external view returns (bytes4 validOrderMagicValue);
+    ) external returns (bytes4 validOrderMagicValue);
 
     // Called by Consideration whenever any extraData is provided by the caller.
     function isValidOrderIncludingExtraData(

@@ -13,6 +13,9 @@ import { ZoneInteractionErrors } from "../interfaces/ZoneInteractionErrors.sol";
 
 import { LowLevelHelpers } from "./LowLevelHelpers.sol";
 
+import "hardhat/console.sol";
+
+
 /**
  * @title ZoneInteraction
  * @author 0age

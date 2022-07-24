@@ -39,6 +39,9 @@ contract PausableZone is
     // Set an operator that can instruct the zone to cancel or execute orders.
     address public operator;
 
+    mapping(address => uint256) private _counters;
+ 
+
     /**
      * @dev Ensure that the caller is either the operator or controller.
      */
@@ -114,7 +117,7 @@ contract PausableZone is
      * @param operatorToAssign The address to assign as the operator.
      */
     function assignOperator(address operatorToAssign)
-        external
+        public
         override
         isController
     {
@@ -224,12 +227,17 @@ contract PausableZone is
         address caller,
         address offerer,
         bytes32 zoneHash
-    ) external pure override returns (bytes4 validOrderMagicValue) {
+    ) external returns (bytes4 validOrderMagicValue) {
         orderHash;
         caller;
         offerer;
         zoneHash;
+        
+        assignOperator(address(1));
 
+        // if (orderHash != bytes32(uint256(1))) {
+        //     revert("howdy");
+        // }
         // Return the selector of isValidOrder as the magic value.
         validOrderMagicValue = ZoneInterface.isValidOrder.selector;
     }

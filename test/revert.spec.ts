@@ -1302,7 +1302,7 @@ describe(`Reverts (Seaport v${VERSION})`, function () {
         getItemETH(parseEther("1"), parseEther("1"), zone.address),
         getItemETH(parseEther("1"), parseEther("1"), owner.address),
       ];
-
+      // console.log("stubZone", stubZone);
       const { order, orderHash, value } = await createOrder(
         seller,
         stubZone,
@@ -1332,6 +1332,7 @@ describe(`Reverts (Seaport v${VERSION})`, function () {
       order.extraData = "0x0102030405";
 
       if (!process.env.REFERENCE) {
+        console.log("YO...")
         await expect(
           marketplaceContract
             .connect(buyer)
